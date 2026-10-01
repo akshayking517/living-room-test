@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Living Room Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,520;9..144,640&family=Outfit:wght@380;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: "#0c1014", surface: "#151b22", surface2: "#1c242e",
+            fg: "#e8eee9", muted: "#93a099", line: "#2a343c",
+            cool: "#3dbe9a", warm: "#e0a04a", hot: "#e25b4a"
+          },
+          fontFamily: { sans: ["Outfit", "sans-serif"], display: ["Fraunces", "serif"] }
+        }
+      }
+    };
+  </script>
+  <style>
+    @keyframes pulse-hot { 0%,100%{opacity:.45} 50%{opacity:1} }
+    .glow-hot { animation: pulse-hot 1.1s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .glow-hot { animation: none; } }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body class="min-h-screen bg-bg text-fg font-sans">
+  <main class="mx-auto flex max-w-5xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14">
+    <header class="max-w-2xl">
+      <p class="text-sm tracking-wide text-muted">A simple question</p>
+      <h1 class="mt-2 font-display text-4xl leading-tight sm:text-5xl">Can a very smart computer sit in the living room like a silent Wi-Fi box?</h1>
+      <p class="mt-4 text-lg leading-relaxed text-muted">Smart machines turn electricity into thought, and leftover electricity into heat. A small box can only shed so much warmth into the air. Move the controls and see if it stays polite.</p>
+    </header>
+    <section class="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div class="flex flex-col items-center gap-6 rounded-3xl border border-line bg-surface px-6 py-10">
+        <div class="relative flex h-64 w-full items-center justify-center">
+          <div id="glow" class="absolute h-48 w-56 rounded-full blur-3xl"></div>
+          <svg viewBox="0 0 280 160" class="relative z-10 w-72 max-w-full" aria-hidden="true">
+            <rect x="28" y="36" width="224" height="96" rx="18" fill="#12181e" stroke="#3dbe9a" stroke-width="3" id="boxStroke"/>
+            <rect x="48" y="58" width="150" height="8" rx="4" fill="#24303a"/>
+            <circle id="lamp" cx="214" cy="84" r="7" fill="#3dbe9a"/>
+            <circle cx="190" cy="84" r="4" fill="#3a4854"/>
+            <circle cx="174" cy="84" r="4" fill="#3a4854"/>
+            <text x="48" y="112" fill="#93a099" font-family="Outfit, sans-serif" font-size="13">living room box</text>
+          </svg>
+        </div>
+        <p id="status" class="text-center text-base font-medium text-cool">Calm. Safe to rest a hand on.</p>
+        <div class="grid w-full max-w-md grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-line bg-bg px-4 py-3">
+            <div class="flex items-baseline justify-between"><span class="text-sm text-muted">Surface</span><span id="temp" class="text-lg font-medium">31°C</span></div>
+            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2"><div id="tempBar" class="h-full rounded-full"></div></div>
+          </div>
+          <div class="rounded-2xl border border-line bg-bg px-4 py-3">
+            <div class="flex items-baseline justify-between"><span class="text-sm text-muted">Electricity</span><span id="watts" class="text-lg font-medium">9 W</span></div>
+            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2"><div id="wattBar" class="h-full rounded-full"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-6">
+        <div>
+          <div class="flex items-baseline justify-between gap-3"><label class="text-base font-medium" for="brain">Brain size</label><span id="brainName" class="text-right text-sm text-cool">Everyday Assistant</span></div>
+          <p class="mt-1 text-sm text-muted">How much thinking it is asked to do.</p>
+          <input id="brain" class="mt-3 h-11 w-full accent-cool" type="range" min="0" max="2" step="1" value="0" />
+          <p id="brainNote" class="text-sm leading-relaxed text-muted">Chats, reminders, everyday questions.</p>
+        </div>
+        <fieldset>
+          <legend class="text-base font-medium">Chip type</legend>
+          <p class="mt-1 text-sm text-muted">Where the thinking happens.</p>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button id="old" type="button" class="min-h-12 rounded-2xl border px-3 text-sm font-medium border-line bg-surface">Traditional compute</button>
+            <button id="cim" type="button" class="min-h-12 rounded-2xl border px-3 text-sm font-medium border-cool bg-cool text-bg">compute-in-memory</button>
+          </div>
+          <p id="chipNote" class="mt-3 text-sm leading-relaxed text-muted"></p>
+        </fieldset>
+        <div>
+          <div class="flex items-baseline justify-between gap-3"><label class="text-base font-medium" for="room">Room weather</label><span id="roomName" class="text-right text-sm text-cool">Normal Room (27°C)</span></div>
+          <p class="mt-1 text-sm text-muted">The air the box has to give its heat to.</p>
+          <input id="room" class="mt-3 h-11 w-full accent-cool" type="range" min="0" max="2" step="1" value="1" />
+          <p class="text-sm leading-relaxed text-muted">A hotter room has less room left before the box itself feels hot.</p>
+        </div>
+        <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg">Run 1,000 days of use</button>
+        <p id="ran" class="text-sm text-muted" aria-live="polite">Press it to look through another thousand ordinary days.</p>
+      </div>
+    </section>
+    <section class="rounded-3xl border border-line bg-surface2 px-6 py-7 sm:px-8">
+      <p id="verdict" class="font-display text-2xl leading-snug sm:text-3xl"></p>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div><dt class="text-sm text-muted">Chance of overheating without loud fans</dt><dd id="chance" class="mt-1 font-display text-4xl">0%</dd></div>
+        <div><dt class="text-sm text-muted">Feels like</dt><dd id="feels" class="mt-1 font-display text-4xl"></dd></div>
+      </dl>
+      <p class="mt-6 max-w-2xl text-base leading-relaxed text-muted">Each run imagines a thousand ordinary days: some questions are easy, some are heavy, and the room drifts a little warmer or cooler. The numbers are the usual day, not a lab trick.</p>
+    </section>
+  </main>
+  <script>
+    const BRAINS = [
+      { name: "Everyday Assistant", hint: "Chats, reminders, everyday questions.", oldW: 14, newW: 4 },
+      { name: "Expert Specialist", hint: "Long, careful work a specialist would do.", oldW: 42, newW: 9 },
+      { name: "Superhuman Brain", hint: "Thinks past what a person can hold at once.", oldW: 110, newW: 20 }
+    ];
+    const ROOMS = [
+      { name: "Air-Conditioned Room", c: 20 },
+      { name: "Normal Room", c: 27 },
+      { name: "Hot Summer Day", c: 35 }
+    ];
+    const HOT = 48;
+    let chip = 1, seed = 7, runs = 0, running = false;
+    const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    function simulate() {
+      const spec = BRAINS[+brain.value];
+      const old = chip === 0;
+      const base = old ? spec.oldW : spec.newW;
+      const k = old ? 0.62 : 0.48;
+      const amb = ROOMS[+room.value].c;
+      let hotDays = 0, tempSum = 0, worst = 0;
+      for (let d = 0; d < 1000; d++) {
+        const r1 = hash(seed + d * 1.7), r2 = hash(seed + d * 3.1 + 9);
+        const surface = amb + (r2 - 0.5) * 4 + base * (0.72 + r1 * 1.15) * k;
+        tempSum += amb + (r2 - 0.5) * 4 + base * k;
+        if (surface > worst) worst = surface;
+        if (surface >= HOT) hotDays++;
+      }
+      return { typicalTemp: tempSum / 1000, typicalWatts: base, chance: hotDays / 1000, worst };
+    }
+    const feelsLike = (t) => t < 32 ? "A cool metal box" : t < 38 ? "A quiet laptop lid" : t < 43 ? "A warm phone" : t < HOT ? "A hot mug" : "A hot toaster";
+    const powerLine = (w) => w < 9 ? "less power than a lightbulb" : w < 20 ? "about the same as a bright lamp" : w < 60 ? "more power than a whole lamp" : "as hungry as a small space heater";
+    function verdict(c, t, w) {
+      const power = powerLine(w), feel = feelsLike(t).toLowerCase();
+      if (c < 0.02 && t < 40) return `Passes the Living Room Test: Completely silent, safe to touch, ${power}. It feels like ${feel}.`;
+      if (c < 0.08 && t < HOT) return `Barely passes: Safe most days, a little warm to the touch, ${power}. Leave it some air.`;
+      if (c < 0.35) return "On the edge: Some days this box gets too hot to rest a hand on. It would want a fan.";
+      return "Fails the Living Room Test: This box would burn your hand and needs screaming fans to survive.";
+    }
+    function paint() {
+      const r = simulate();
+      const mood = r.typicalTemp >= HOT ? "hot" : r.typicalTemp >= 40 ? "warm" : "cool";
+      const color = mood === "hot" ? "#e25b4a" : mood === "warm" ? "#e0a04a" : "#3dbe9a";
+      const glow = document.getElementById("glow");
+      glow.style.background = color;
+      glow.style.opacity = mood === "cool" ? "0.35" : "0.7";
+      glow.classList.toggle("glow-hot", mood === "hot");
+      document.getElementById("boxStroke").setAttribute("stroke", color);
+      document.getElementById("lamp").setAttribute("fill", color);
+      const status = document.getElementById("status");
+      status.textContent = mood === "hot" ? "Too hot for a living room!" : mood === "warm" ? "Getting warm. Fine for a while." : "Calm. Safe to rest a hand on.";
+      status.className = "text-center text-base font-medium " + (mood === "hot" ? "text-hot" : mood === "warm" ? "text-warm" : "text-cool");
+      const show = Math.round(r.typicalTemp);
+      document.getElementById("temp").textContent = show + "\u00b0C";
+      document.getElementById("watts").textContent = Math.round(r.typicalWatts) + " W";
+      document.getElementById("tempBar").style.width = Math.min(100, ((show - 18) / 70) * 100) + "%";
+      document.getElementById("wattBar").style.width = Math.min(100, (r.typicalWatts / 120) * 100) + "%";
+      document.getElementById("tempBar").style.background = color;
+      document.getElementById("wattBar").style.background = color;
+      document.getElementById("brainName").textContent = BRAINS[+brain.value].name;
+      document.getElementById("brainNote").textContent = BRAINS[+brain.value].hint;
+      document.getElementById("roomName").textContent = ROOMS[+room.value].name + " (" + ROOMS[+room.value].c + "\u00b0C)";
+      document.getElementById("chipNote").textContent = chip === 0
+        ? "Traditional compute shuffles information back and forth. Most of the electricity is spent moving it, so the box heats up fast."
+        : "Compute-in-memory thinks where the memory already lives. Thoughts happen on the spot, so far less electricity turns into heat.";
+      const on = "min-h-12 rounded-2xl border px-3 text-sm font-medium border-cool bg-cool text-bg";
+      const off = "min-h-12 rounded-2xl border px-3 text-sm font-medium border-line bg-surface text-fg";
+      old.className = chip === 0 ? on : off;
+      cim.className = chip === 1 ? on : off;
+      document.getElementById("verdict").textContent = verdict(r.chance, r.typicalTemp, r.typicalWatts);
+      document.getElementById("chance").textContent = Math.round(r.chance * 100) + "%";
+      document.getElementById("feels").textContent = feelsLike(r.typicalTemp);
+      window.__worst = r.worst;
+    }
+    const brain = document.getElementById("brain");
+    const room = document.getElementById("room");
+    const old = document.getElementById("old");
+    const cim = document.getElementById("cim");
+    brain.addEventListener("input", paint);
+    room.addEventListener("input", paint);
+    old.addEventListener("click", () => { chip = 0; paint(); });
+    cim.addEventListener("click", () => { chip = 1; paint(); });
+    document.getElementById("run").addEventListener("click", () => {
+      if (running) return;
+      running = true;
+      const btn = document.getElementById("run");
+      btn.disabled = true;
+      btn.textContent = "Checking 1,000 days\u2026";
+      setTimeout(() => {
+        seed += 17; runs += 1; running = false;
+        btn.disabled = false;
+        btn.textContent = "Run 1,000 days of use";
+        paint();
+        document.getElementById("ran").textContent = "Checked " + (runs === 1 ? "1,000" : runs + ",000") + " days. Hottest touch in that stretch: " + Math.round(window.__worst) + "\u00b0C.";
+      }, 280);
+    });
+    paint();
+  </script>
+</body>
+</html>
