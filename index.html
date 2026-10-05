@@ -62,10 +62,10 @@
       </div>
       <div class="flex flex-col gap-6">
         <div>
-          <div class="flex items-baseline justify-between gap-3"><label class="text-base font-medium" for="brain">Brain size</label><span id="brainName" class="text-right text-sm text-cool">Everyday Assistant</span></div>
-          <p class="mt-1 text-sm text-muted">How much thinking it is asked to do.</p>
-          <input id="brain" class="mt-3 h-11 w-full accent-cool" type="range" min="0" max="2" step="1" value="0" />
-          <p id="brainNote" class="text-sm leading-relaxed text-muted">Chats, reminders, everyday questions.</p>
+          <div class="flex items-baseline justify-between gap-3"><label class="text-base font-medium" for="brain">Weights</label><span id="brainName" class="text-right text-sm text-cool">1 billion</span></div>
+          <p class="mt-1 text-sm text-muted">How many weights the brain needs.</p>
+          <input id="brain" class="mt-3 h-11 w-full accent-cool" type="range" min="0" max="3" step="1" value="0" />
+          <p id="brainNote" class="text-sm leading-relaxed text-muted">Not a nickname. A count.</p>
         </div>
         <fieldset>
           <legend class="text-base font-medium">Chip type</legend>
@@ -89,31 +89,29 @@
     <section class="rounded-3xl border border-line bg-surface2 px-6 py-7 sm:px-8">
       <p id="verdict" class="font-display text-2xl leading-snug sm:text-3xl"></p>
       <dl class="mt-6 grid gap-4 sm:grid-cols-2">
-        <div><dt class="text-sm text-muted">Chance of overheating without loud fans</dt><dd id="chance" class="mt-1 font-display text-4xl">0%</dd></div>
-        <div><dt class="text-sm text-muted">Feels like</dt><dd id="feels" class="mt-1 font-display text-4xl"></dd></div>
+        <div><dt class="text-sm text-muted">On the array, under 45 W, no fan</dt><dd id="onArray" class="mt-1 font-display text-4xl">1 billion</dd></div>
+        <div><dt class="text-sm text-muted">The rest</dt><dd id="rest" class="mt-1 font-display text-4xl">0 billion</dd></div>
       </dl>
-      <p class="mt-6 max-w-2xl text-base leading-relaxed text-muted">Each run imagines a thousand ordinary days: some questions are easy, some are heavy, and the room drifts a little warmer or cooler. The numbers are the usual day, not a lab trick.</p>
+      <p class="mt-6 max-w-2xl text-base leading-relaxed text-muted">This box's array holds 1 billion weights. Under 45 W those can sit still. Every weight past that has to be carried in, and the carrying is the heat.</p>
     </section>
   </main>
   <script>
-    const BRAINS = [
-      { name: "Everyday Assistant", hint: "Chats, reminders, everyday questions.", oldW: 14, newW: 4 },
-      { name: "Expert Specialist", hint: "Long, careful work a specialist would do.", oldW: 42, newW: 9 },
-      { name: "Superhuman Brain", hint: "Thinks past what a person can hold at once.", oldW: 110, newW: 20 }
-    ];
+    const WEIGHTS = [1, 8, 70, 400];
+    const ARRAY = 1, SIT = 8, CARRY = 40, FAN = 45, HOT = 48;
     const ROOMS = [
       { name: "Air-Conditioned Room", c: 20 },
       { name: "Normal Room", c: 27 },
       { name: "Hot Summer Day", c: 35 }
     ];
-    const HOT = 48;
     let chip = 1, seed = 7, runs = 0, running = false;
     const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
     function simulate() {
-      const spec = BRAINS[+brain.value];
+      const total = WEIGHTS[+brain.value];
       const old = chip === 0;
-      const base = old ? spec.oldW : spec.newW;
-      const k = old ? 0.62 : 0.48;
+      const onArray = old ? 0 : Math.min(total, ARRAY);
+      const rest = total - onArray;
+      const base = onArray * SIT + rest * CARRY;
+      const k = old || rest > 0 ? 0.62 : 0.48;
       const amb = ROOMS[+room.value].c;
       let hotDays = 0, tempSum = 0, worst = 0;
       for (let d = 0; d < 1000; d++) {
@@ -123,16 +121,15 @@
         if (surface > worst) worst = surface;
         if (surface >= HOT) hotDays++;
       }
-      return { typicalTemp: tempSum / 1000, typicalWatts: base, chance: hotDays / 1000, worst };
+      return { typicalTemp: tempSum / 1000, typicalWatts: base, chance: hotDays / 1000, worst, onArray, rest };
     }
-    const feelsLike = (t) => t < 32 ? "A cool metal box" : t < 38 ? "A quiet laptop lid" : t < 43 ? "A warm phone" : t < HOT ? "A hot mug" : "A hot toaster";
-    const powerLine = (w) => w < 9 ? "less power than a lightbulb" : w < 20 ? "about the same as a bright lamp" : w < 60 ? "more power than a whole lamp" : "as hungry as a small space heater";
-    function verdict(c, t, w) {
-      const power = powerLine(w), feel = feelsLike(t).toLowerCase();
-      if (c < 0.02 && t < 40) return `Passes the Living Room Test: Completely silent, safe to touch, ${power}. It feels like ${feel}.`;
-      if (c < 0.08 && t < HOT) return `Barely passes: Safe most days, a little warm to the touch, ${power}. Leave it some air.`;
-      if (c < 0.35) return "On the edge: Some days this box gets too hot to rest a hand on. It would want a fan.";
-      return "Fails the Living Room Test: This box would burn your hand and needs screaming fans to survive.";
+    function verdict(r) {
+      const on = r.onArray + " billion", left = r.rest === 0 ? "Nothing has to be carried in." : r.rest + " billion have to be carried in.";
+      if (r.rest === 0 && r.typicalWatts <= FAN && r.chance < 0.02 && r.typicalTemp < 40)
+        return "A product, not a sentence: " + on + " weights sit on the array. " + left + " Under 45 W, no fan.";
+      if (r.typicalWatts <= FAN && r.chance < 0.08)
+        return "Close: " + on + " weights sit on the array. " + left + " It stays near 45 W, but some days it wants a fan.";
+      return "A sentence, not a product: " + on + " weights sit on the array. " + left + " That is past 45 W with no fan.";
     }
     function paint() {
       const r = simulate();
@@ -151,11 +148,11 @@
       document.getElementById("temp").textContent = show + "\u00b0C";
       document.getElementById("watts").textContent = Math.round(r.typicalWatts) + " W";
       document.getElementById("tempBar").style.width = Math.min(100, ((show - 18) / 70) * 100) + "%";
-      document.getElementById("wattBar").style.width = Math.min(100, (r.typicalWatts / 120) * 100) + "%";
+      document.getElementById("wattBar").style.width = Math.min(100, (r.typicalWatts / FAN) * 100) + "%";
       document.getElementById("tempBar").style.background = color;
       document.getElementById("wattBar").style.background = color;
-      document.getElementById("brainName").textContent = BRAINS[+brain.value].name;
-      document.getElementById("brainNote").textContent = BRAINS[+brain.value].hint;
+      document.getElementById("brainName").textContent = WEIGHTS[+brain.value] + " billion";
+      document.getElementById("brainNote").textContent = "Not a nickname. A count.";
       document.getElementById("roomName").textContent = ROOMS[+room.value].name + " (" + ROOMS[+room.value].c + "\u00b0C)";
       document.getElementById("chipNote").textContent = chip === 0
         ? "Traditional compute shuffles information back and forth. Most of the electricity is spent moving it, so the box heats up fast."
@@ -164,9 +161,9 @@
       const off = "min-h-12 rounded-2xl border px-3 text-sm font-medium border-line bg-surface text-fg";
       old.className = chip === 0 ? on : off;
       cim.className = chip === 1 ? on : off;
-      document.getElementById("verdict").textContent = verdict(r.chance, r.typicalTemp, r.typicalWatts);
-      document.getElementById("chance").textContent = Math.round(r.chance * 100) + "%";
-      document.getElementById("feels").textContent = feelsLike(r.typicalTemp);
+      document.getElementById("verdict").textContent = verdict(r);
+      document.getElementById("onArray").textContent = r.onArray + " billion";
+      document.getElementById("rest").textContent = r.rest + " billion";
       window.__worst = r.worst;
     }
     const brain = document.getElementById("brain");
