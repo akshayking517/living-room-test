@@ -6,6 +6,7 @@ The box is not a router. Inside is a compute-in-memory chip that holds 80 millio
 
 Open `index.html` in a browser. No install. The same page is the GitHub Pages site.
 
-- **Weights** — from 80 million up to billions
+- **Weights** — from 80 million up to 8 billion
 - **Hand limit** — 18 watts, calculated for a 22 × 14 × 4.5 cm shell in 25°C air, before the outside is too hot to keep a hand on
+- **Off the chip** — every extra 100 million weights, hauled 100 times a second, costs about 1.5 watts. One billion weights lands on 18 watts.
 - **Run 1,000 days of use** — another stretch of ordinary days

@@ -92,7 +92,7 @@
             <span id="weight-label" class="text-sm text-cool">80 million</span>
           </div>
           <p class="mt-1 text-sm text-muted">How big a brain the house is asking for.</p>
-          <input id="weights" type="range" min="0" max="6" step="1" value="0" />
+          <input id="weights" type="range" min="0" max="7" step="1" value="0" />
           <p id="weight-note" class="text-sm leading-relaxed text-muted">All of these weights sit on the chip. Thinking happens where they already are.</p>
         </div>
         <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg disabled:opacity-70">Run 1,000 days of use</button>
@@ -118,10 +118,10 @@
     </section>
   </main>
   <script>
-    const STEPS = [80, 160, 320, 640, 1000, 3000, 8000];
+    const STEPS = [80, 160, 320, 640, 1000, 1500, 3000, 8000];
     const SHELF = 80;
     const CHIP_WATTS = 4;
-    const CARRY_PER_SHELF = 8;
+    const CARRY_PER_100M = 1.5;
     const HAND = 18;
     let seed = 3;
     let runs = 0;
@@ -138,13 +138,16 @@
       }
       return millions + " million";
     }
+    function wattsText(n) {
+      return Number.isInteger(n) ? String(n) : n.toFixed(1);
+    }
     function split(step) {
       const total = STEPS[step];
       const onChip = Math.min(total, SHELF);
       const carried = total - onChip;
       const chipWatts = CHIP_WATTS * (onChip / SHELF);
-      const carryWatts = (carried / SHELF) * CARRY_PER_SHELF;
-      return { total, onChip, carried, chipWatts, carryWatts, watts: chipWatts + carryWatts };
+      const carryWatts = (carried / 100) * CARRY_PER_100M;
+      return { total, onChip, carried, chipWatts, carryWatts, watts: Math.round(chipWatts + carryWatts) };
     }
     function simulate(step) {
       const base = split(step);
@@ -162,10 +165,13 @@
       if (s.carried === 0 && s.watts < HAND && s.chance < 0.02) {
         return "Yes. All 80 million weights stay on the chip, the box uses about 4 watts, and a hand can stay on it. No fan.";
       }
-      if (s.watts < HAND && s.chance < 0.08) {
-        return "Still quiet. " + labelOf(s.carried) + " left the chip, but the shell can still hand the heat to the air. No fan yet.";
+      if (s.watts === HAND) {
+        return "Right on the line. " + labelOf(s.onChip) + " still sit on the chip. " + labelOf(s.carried) + " have to be hauled in, 100 times a second. That is " + HAND + " watts, the point where a hand cannot stay, so the box needs a fan.";
       }
-      return "No. Only " + labelOf(s.onChip) + " still think on the chip. " + labelOf(s.carried) + " moved to a processor, because they have to be carried in. That is past " + HAND + " watts. Past that, a hand cannot stay, so the box needs a fan.";
+      if (s.watts < HAND && s.chance < 0.08) {
+        return "Still quiet. " + labelOf(s.carried) + " left the chip. Hauling them 100 times a second still fits under " + HAND + " watts. No fan yet.";
+      }
+      return "No. Only " + labelOf(s.onChip) + " still think on the chip. " + labelOf(s.carried) + " have to be hauled across the wires 100 times a second. That is " + s.watts + " watts, past the " + HAND + " watt line, so the box needs a fan.";
     }
     function paint() {
       const step = Number(document.getElementById("weights").value);
@@ -188,7 +194,7 @@
       document.getElementById("weight-label").textContent = labelOf(s.total);
       document.getElementById("weight-note").textContent = s.carried === 0
         ? "All of these weights sit on the chip. Thinking happens where they already are."
-        : "Only 80 million still sit on the chip. The rest moved to a processor, and that processor has to carry them in.";
+        : "Only 80 million still sit on the chip. The rest sit outside it, and have to be hauled in 100 times a second.";
       document.getElementById("verdict").textContent = verdict(s);
       document.getElementById("on-chip").textContent = labelOf(s.onChip);
       document.getElementById("on-note").textContent = "Thinking happens where these weights sit. About " + Math.round(s.chipWatts) + " W.";
@@ -196,9 +202,11 @@
       document.getElementById("carry-note").textContent = s.carried === 0
         ? "Nothing left the chip."
         : s.watts < HAND
-          ? "These have to be carried in. About " + Math.round(s.carryWatts) + " W. The shell can still take it."
-          : "These have to be carried in. About " + Math.round(s.carryWatts) + " W. That is what forces a fan.";
-      document.getElementById("fine").textContent = "Chance of a day that needs a fan: " + Math.round(s.chance * 100) + "%. A hand left on the shell for about 10 minutes reaches the burn line at 48°C, for plastic or for metal. This box is 22 cm by 14 cm by 4.5 cm, sitting on a shelf, in 25°C air. Still air can take about 18 watts before the outside hits that line. Above that, the shell would have to get hotter, so it needs a fan. That 18 watts is a calculation, not a measurement of a finished box. The 80 million and the 4 watts are what a chip on sale today publishes. The climb after that is a picture: every extra 80 million that must be carried is counted as 8 watts.";
+          ? "Hauled 100 times a second. About " + wattsText(s.carryWatts) + " W. The shell can still take it."
+          : s.watts === HAND
+            ? "Hauled 100 times a second. About " + wattsText(s.carryWatts) + " W. With the chip, that is the 18 watt line."
+            : "Hauled 100 times a second. About " + wattsText(s.carryWatts) + " W. That is what forces a fan.";
+      document.getElementById("fine").textContent = "Chance of a day that needs a fan: " + Math.round(s.chance * 100) + "%. A hand left on the shell for about 10 minutes reaches the burn line at 48°C, for plastic or for metal. This box is 22 cm by 14 cm by 4.5 cm, sitting on a shelf, in 25°C air. Still air can take about 18 watts before the outside hits that line. The chip itself stays near 4 watts while the weights sit on it. Past 80 million, the house still wants an instant answer, 100 times a second. Every extra 100 million weights stored off the chip have to be hauled across the wires that often, and that haul costs about 1.5 watts. One billion weights lands on 18 watts. That is the tipping point, and above it the shell needs a fan. The 80 million and the 4 watts are what a chip on sale today publishes. The haul cost is the shape of real memory, not a measurement of this box.";
       document.getElementById("runs").textContent = runs === 0
         ? "Press it to look through another thousand ordinary days."
         : "Checked " + (runs === 1 ? "1,000 days" : runs + ",000 days") + ". Busiest stretch: " + Math.round(s.worst) + " W.";
