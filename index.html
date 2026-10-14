@@ -46,7 +46,7 @@
     <header class="max-w-2xl">
       <p class="text-sm tracking-wide text-muted">One box for the house</p>
       <h1 class="mt-2 font-display text-4xl leading-tight sm:text-5xl">Can the house answer its own devices, quietly?</h1>
-      <p class="mt-4 text-lg leading-relaxed text-muted">The box is about the size of a Wi-Fi router. It is not a router. Pick whether the weights are hauled over wires, or stay in place. Then slide how many the house is asking for.</p>
+      <p class="mt-4 text-lg leading-relaxed text-muted">Same box, two ways to think. One hauls every weight across a wire on every answer. The other leaves every weight where it sits.</p>
     </header>
 
     <section class="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -87,8 +87,8 @@
 
       <div class="flex flex-col gap-6">
         <div role="radiogroup" aria-label="How the weights sit" class="grid gap-2">
-          <button id="way-haul" type="button" role="radio" aria-checked="true" class="min-h-11 rounded-2xl border border-cool bg-cool px-4 py-3 text-left text-sm font-medium text-bg">Haul over wires (Today's von Neumann)</button>
-          <button id="way-stay" type="button" role="radio" aria-checked="false" class="min-h-11 rounded-2xl border border-line bg-bg px-4 py-3 text-left text-sm font-medium text-fg">All weights stay in place (Compute-in-memory fabric)</button>
+          <button id="way-haul" type="button" role="radio" aria-checked="true" class="min-h-11 rounded-2xl border border-cool bg-cool px-4 py-3 text-left text-sm font-medium text-bg">Von Neumann / GPU (Weights hauled on every token)</button>
+          <button id="way-stay" type="button" role="radio" aria-checked="false" class="min-h-11 rounded-2xl border border-line bg-bg px-4 py-3 text-left text-sm font-medium text-fg">Compute-in-Memory (Weights stay in place)</button>
         </div>
         <div>
           <div class="flex items-baseline justify-between gap-3">
@@ -97,7 +97,7 @@
           </div>
           <p class="mt-1 text-sm text-muted">How big a brain the house is asking for.</p>
           <input id="weights" type="range" min="0" max="7" step="1" value="0" />
-          <p id="weight-note" class="text-sm leading-relaxed text-muted">All of these weights sit on the chip. Thinking happens where they already are.</p>
+          <p id="weight-note" class="text-sm leading-relaxed text-muted">Every weight lives off the chip, and is hauled across a wire 100 times a second.</p>
         </div>
         <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg disabled:opacity-70">Run 1,000 days of use</button>
         <p id="runs" class="text-sm text-muted" aria-live="polite">Press it to look through another thousand ordinary days.</p>
@@ -114,7 +114,7 @@
         </div>
         <div class="rounded-2xl border border-line bg-bg px-4 py-4">
           <dt class="text-sm text-muted">Moved to the processor</dt>
-          <dd id="carried" class="mt-1 font-display text-4xl">0 million</dd>
+          <dd id="carried" class="mt-1 font-display text-4xl">80 million</dd>
           <p id="carry-note" class="mt-2 text-sm text-muted"></p>
         </div>
       </dl>
@@ -123,10 +123,9 @@
   </main>
   <script>
     const STEPS = [80, 160, 320, 640, 1000, 1500, 3000, 8000];
-    const SHELF = 80;
-    const CHIP_WATTS = 4;
-    const CARRY_PER_100M = 1.5;
-    const PLACE_PER_100M = 0.15;
+    const BASE_WATTS = 3;
+    const HAUL_PER_100M = 1.5;
+    const STAY_PER_100M = 0.15;
     const HAND = 18;
     let way = "haul";
     let seed = 3;
@@ -149,16 +148,15 @@
     }
     function split(step) {
       const total = STEPS[step];
-      if (way === "stay") {
-        const extra = Math.max(0, total - SHELF);
-        const watts = Math.round(CHIP_WATTS + (extra / 100) * PLACE_PER_100M);
-        return { total, onChip: total, carried: 0, chipWatts: CHIP_WATTS, carryWatts: 0, watts };
-      }
-      const onChip = Math.min(total, SHELF);
-      const carried = total - onChip;
-      const chipWatts = CHIP_WATTS * (onChip / SHELF);
-      const carryWatts = (carried / 100) * CARRY_PER_100M;
-      return { total, onChip, carried, chipWatts, carryWatts, watts: Math.round(chipWatts + carryWatts) };
+      const rate = way === "stay" ? STAY_PER_100M : HAUL_PER_100M;
+      const moveWatts = (total / 100) * rate;
+      return {
+        total: total,
+        onChip: way === "stay" ? total : 0,
+        carried: way === "stay" ? 0 : total,
+        moveWatts: moveWatts,
+        watts: Math.round(BASE_WATTS + moveWatts)
+      };
     }
     function simulate(step) {
       const base = split(step);
@@ -170,22 +168,13 @@
         if (watts > worst) worst = watts;
         if (watts >= HAND) noisy += 1;
       }
-      return Object.assign(base, { chance: noisy / 1000, worst });
+      return Object.assign(base, { chance: noisy / 1000, worst: worst });
     }
     function verdict(s) {
       if (way === "stay") {
-        return "Yes. All " + labelOf(s.total) + " weights stay in their seats. Zero wires crossed. The whole box uses " + s.watts + " watts, so a hand can stay and no fan is needed.";
+        return "All " + labelOf(s.total) + " weights stay in their seats. Zero wires crossed. Entire box draws " + s.watts + " watts. A hand can stay. No fan.";
       }
-      if (s.carried === 0 && s.watts < HAND && s.chance < 0.02) {
-        return "Yes. All 80 million weights stay on the chip, the box uses about 4 watts, and a hand can stay on it. No fan.";
-      }
-      if (s.watts === HAND) {
-        return "Right on the line. " + labelOf(s.onChip) + " still sit on the chip. " + labelOf(s.carried) + " have to be hauled in, 100 times a second. That is " + HAND + " watts, the point where a hand cannot stay, so the box needs a fan.";
-      }
-      if (s.watts < HAND && s.chance < 0.08) {
-        return "Still quiet. " + labelOf(s.carried) + " left the chip. Hauling them 100 times a second still fits under " + HAND + " watts. No fan yet.";
-      }
-      return "No. Only " + labelOf(s.onChip) + " still think on the chip. " + labelOf(s.carried) + " have to be hauled across the wires 100 times a second. That is " + s.watts + " watts, past the " + HAND + " watt line, so the box needs a fan.";
+      return "Hauling " + labelOf(s.total) + " weights across wires 100 times a second burns " + s.watts + " watts. " + (s.watts >= HAND ? "Needs a fan." : "Stays quiet.");
     }
     function paint() {
       const step = Number(document.getElementById("weights").value);
@@ -200,35 +189,33 @@
       document.getElementById("lamp").setAttribute("fill", color);
       const moodEl = document.getElementById("mood");
       moodEl.className = "text-center text-base font-medium " + (mood === "hot" ? "text-hot" : mood === "warm" ? "text-warm" : "text-cool");
-      moodEl.textContent = mood === "hot" ? "Too hot to keep a hand on. Needs a fan." : mood === "warm" ? "Warm. A hand can still stay." : "A hand can stay. No fan.";
+      moodEl.textContent = mood === "hot"
+        ? (s.watts === HAND ? "Right on the hand limit. Needs a fan." : "Too hot to keep a hand on. Needs a fan.")
+        : mood === "warm" ? "Warm. A hand can still stay." : "A hand can stay. No fan.";
       document.getElementById("watts").textContent = Math.round(s.watts) + " W";
       const bar = document.getElementById("watts-bar");
       bar.style.width = Math.min(100, (s.watts / HAND) * 100) + "%";
       bar.style.background = color;
       document.getElementById("weight-label").textContent = labelOf(s.total);
       document.getElementById("weight-note").textContent = way === "stay"
-        ? "Every weight stays where it lives. Nothing is hauled across a wire."
-        : s.carried === 0
-          ? "All of these weights sit on the chip. Thinking happens where they already are."
-          : "Only 80 million still sit on the chip. The rest sit outside it, and have to be hauled in 100 times a second.";
+        ? "Every weight stays where it lives. Nothing crosses a wire."
+        : "Every weight lives off the chip, and is hauled across a wire 100 times a second.";
       document.getElementById("verdict").textContent = verdict(s);
       document.getElementById("on-chip").textContent = labelOf(s.onChip);
       document.getElementById("on-note").textContent = way === "stay"
-        ? "Thinking happens right where the weights live. Idle weights sleep for free."
-        : "Thinking happens where these weights sit. About " + Math.round(s.chipWatts) + " W.";
+        ? "Thinking happens right where the weights live."
+        : "None of the weights sit where the thinking happens.";
       document.getElementById("carried").textContent = labelOf(s.carried);
       document.getElementById("carry-note").textContent = way === "stay"
-        ? "0 million moved. 0 W wasted on wires."
-        : s.carried === 0
-          ? "Nothing left the chip."
-          : s.watts < HAND
-            ? "Hauled 100 times a second. About " + wattsText(s.carryWatts) + " W. The shell can still take it."
-            : s.watts === HAND
-              ? "Hauled 100 times a second. About " + wattsText(s.carryWatts) + " W. With the chip, that is the 18 watt line."
-              : "Hauled 100 times a second. About " + wattsText(s.carryWatts) + " W. That is what forces a fan.";
+        ? "Nothing leaves its seat."
+        : s.watts < HAND
+          ? "Hauled 100 times a second. About " + wattsText(s.moveWatts) + " W, plus 3 W for the box."
+          : s.watts === HAND
+            ? "Hauled 100 times a second. About " + wattsText(s.moveWatts) + " W. With the box, that is the 18 watt line."
+            : "Hauled 100 times a second. About " + wattsText(s.moveWatts) + " W. That is what forces a fan.";
       document.getElementById("fine").textContent = way === "stay"
-        ? "In a traditional processor, hauling 8 billion weights across copper wires 100 times a second burns 119 W just in bus transit, forcing a noisy fan. Keeping those same weights stationary inside a non-volatile compute-in-memory fabric eliminates data movement entirely—running that same 8-billion-weight brain at just 16 W, cool and silent to the touch."
-        : "Chance of a day that needs a fan: " + Math.round(s.chance * 100) + "%. A hand left on the shell for about 10 minutes reaches the burn line at 48°C, for plastic or for metal. This box is 22 cm by 14 cm by 4.5 cm, sitting on a shelf, in 25°C air. Still air can take about 18 watts before the outside hits that line. The chip itself stays near 4 watts while the weights sit on it. Past 80 million, the house still wants an instant answer, 100 times a second. Every extra 100 million weights stored off the chip have to be hauled across the wires that often, and that haul costs about 1.5 watts. One billion weights lands on 18 watts. That is the tipping point, and above it the shell needs a fan. The 80 million and the 4 watts are what a chip on sale today publishes. The haul cost is the shape of real memory, not a measurement of this box.";
+        ? "Every weight stays in its seat. The box itself is 3 watts. Thinking in place costs 0.15 watts per 100 million weights. Eight billion weights is 15 watts, still under the line. Hauling those same 8 billion burns 123 watts and needs a fan. The hand limit is 18 watts for a 22 cm by 14 cm by 4.5 cm box in 25°C air, before the outside hits 48°C."
+        : "Chance of a day that needs a fan: " + Math.round(s.chance * 100) + "%. Every weight lives off the chip. The box itself is 3 watts. Hauling costs 1.5 watts per 100 million weights, 100 times a second. One billion weights is 18 watts, the point where a hand cannot stay. The hand limit is for a 22 cm by 14 cm by 4.5 cm box in 25°C air, before the outside hits 48°C. That 18 watts is a calculation, not a measurement of a finished box.";
       document.getElementById("runs").textContent = runs === 0
         ? "Press it to look through another thousand ordinary days."
         : "Checked " + (runs === 1 ? "1,000 days" : runs + ",000 days") + ". Busiest stretch: " + Math.round(s.worst) + " W.";
