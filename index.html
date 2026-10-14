@@ -52,7 +52,7 @@
     <section class="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
       <div class="flex flex-col items-center gap-6 rounded-3xl border border-line bg-surface px-6 py-10">
         <div class="relative flex h-64 w-full items-center justify-center">
-          <div id="glow" class="absolute h-48 w-56 rounded-full blur-3xl"></div>
+          <div id="glow" class="pointer-events-none absolute h-48 w-56 rounded-full blur-3xl"></div>
           <svg viewBox="0 0 280 160" class="relative z-10 w-72 max-w-full" aria-hidden="true">
             <rect x="28" y="36" width="224" height="96" rx="18" fill="#0c1014" stroke="#3dbe9a" stroke-width="3" id="box-body" />
             <rect x="48" y="58" width="150" height="8" rx="4" fill="#2a343c" />
@@ -96,7 +96,8 @@
             <span id="weight-label" class="text-sm text-cool">80 million</span>
           </div>
           <p class="mt-1 text-sm text-muted">How big a brain the house is asking for.</p>
-          <input id="weights" type="range" min="0" max="7" step="1" value="0" />
+          <input id="weights" type="range" min="0" max="7" step="1" value="0" class="relative z-10 mt-3 h-11 w-full" />
+          <div id="stops" class="mt-2 flex flex-wrap gap-2"></div>
           <p id="weight-note" class="text-sm leading-relaxed text-muted">Every weight lives off the chip, and is hauled across a wire 100 times a second.</p>
         </div>
         <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg disabled:opacity-70">Run 1,000 days of use</button>
@@ -184,7 +185,7 @@
       const glow = document.getElementById("glow");
       glow.style.background = color;
       glow.style.opacity = mood === "cool" ? "0.35" : "0.7";
-      glow.className = "absolute h-48 w-56 rounded-full blur-3xl" + (mood === "hot" ? " glow-hot" : "");
+      glow.className = "pointer-events-none absolute h-48 w-56 rounded-full blur-3xl" + (mood === "hot" ? " glow-hot" : "");
       document.getElementById("box-body").setAttribute("stroke", color);
       document.getElementById("lamp").setAttribute("fill", color);
       const moodEl = document.getElementById("mood");
@@ -197,6 +198,10 @@
       bar.style.width = Math.min(100, (s.watts / HAND) * 100) + "%";
       bar.style.background = color;
       document.getElementById("weight-label").textContent = labelOf(s.total);
+      document.querySelectorAll("#stops button").forEach(function (button) {
+        const on = Number(button.dataset.step) === step;
+        button.className = "min-h-11 rounded-full border px-3 text-sm " + (on ? "border-cool bg-cool text-bg" : "border-line bg-bg text-muted");
+      });
       document.getElementById("weight-note").textContent = way === "stay"
         ? "Every weight stays where it lives. Nothing crosses a wire."
         : "Every weight lives off the chip, and is hauled across a wire 100 times a second.";
@@ -232,7 +237,28 @@
       stay.setAttribute("aria-checked", way === "stay" ? "true" : "false");
       paint();
     }
+    function setStep(i) {
+      const slider = document.getElementById("weights");
+      slider.value = String(i);
+      paint();
+    }
+    const stops = document.getElementById("stops");
+    STEPS.forEach(function (millions, i) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.step = String(i);
+      button.textContent = labelOf(millions);
+      button.className = "min-h-11 rounded-full border px-3 text-sm";
+      button.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        setStep(i);
+      });
+      button.addEventListener("click", function () { setStep(i); });
+      stops.appendChild(button);
+    });
+    document.getElementById("way-haul").addEventListener("pointerdown", function (e) { e.preventDefault(); setWay("haul"); });
     document.getElementById("way-haul").addEventListener("click", function () { setWay("haul"); });
+    document.getElementById("way-stay").addEventListener("pointerdown", function (e) { e.preventDefault(); setWay("stay"); });
     document.getElementById("way-stay").addEventListener("click", function () { setWay("stay"); });
     document.getElementById("weights").addEventListener("input", paint);
     document.getElementById("run").addEventListener("click", function () {
