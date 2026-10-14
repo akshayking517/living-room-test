@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Living Room Test</title>
+  <title>Home box</title>
+  <link rel="icon" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,520;9..144,640&family=Outfit:wght@380;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -12,180 +14,209 @@
       theme: {
         extend: {
           colors: {
-            bg: "#0c1014", surface: "#151b22", surface2: "#1c242e",
-            fg: "#e8eee9", muted: "#93a099", line: "#2a343c",
-            cool: "#3dbe9a", warm: "#e0a04a", hot: "#e25b4a"
+            bg: "#0c1014",
+            surface: "#151b22",
+            surface2: "#1c242e",
+            fg: "#e8eee9",
+            muted: "#93a099",
+            line: "#2a343c",
+            cool: "#3dbe9a",
+            warm: "#e0a04a",
+            hot: "#e25b4a"
           },
-          fontFamily: { sans: ["Outfit", "sans-serif"], display: ["Fraunces", "serif"] }
+          fontFamily: {
+            sans: ["Outfit", "ui-sans-serif", "system-ui", "sans-serif"],
+            display: ["Fraunces", "ui-serif", "Georgia", "serif"]
+          }
         }
       }
     };
   </script>
   <style>
-    @keyframes pulse-hot { 0%,100%{opacity:.45} 50%{opacity:1} }
+    button { cursor: pointer; }
+    body { background: #0c1014; color: #e8eee9; }
+    @keyframes pulse-hot { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
     .glow-hot { animation: pulse-hot 1.1s ease-in-out infinite; }
     @media (prefers-reduced-motion: reduce) { .glow-hot { animation: none; } }
-    button { cursor: pointer; }
+    input[type="range"] { accent-color: #3dbe9a; height: 2.75rem; width: 100%; }
   </style>
 </head>
-<body class="min-h-screen bg-bg text-fg font-sans">
-  <main class="mx-auto flex max-w-5xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14">
+<body class="min-h-screen bg-bg font-sans text-fg">
+  <main class="mx-auto flex max-w-5xl flex-col gap-8 px-5 py-10 sm:px-8 sm:py-14">
     <header class="max-w-2xl">
-      <p class="text-sm tracking-wide text-muted">A simple question</p>
-      <h1 class="mt-2 font-display text-4xl leading-tight sm:text-5xl">Can a very smart computer sit in the living room like a silent Wi-Fi box?</h1>
-      <p class="mt-4 text-lg leading-relaxed text-muted">Smart machines turn electricity into thought, and leftover electricity into heat. A small box can only shed so much warmth into the air. Move the controls and see if it stays polite.</p>
+      <p class="text-sm tracking-wide text-muted">One box for the house</p>
+      <h1 class="mt-2 font-display text-4xl leading-tight sm:text-5xl">Can the house answer its own devices, quietly?</h1>
+      <p class="mt-4 text-lg leading-relaxed text-muted">The box is about the size of a Wi-Fi router. It is not a router. Inside is a compute-in-memory chip that holds 80 million weights and uses about 4 watts. Slide the weights up. Past 80 million, the extra weights cannot stay on the chip.</p>
     </header>
+
     <section class="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
       <div class="flex flex-col items-center gap-6 rounded-3xl border border-line bg-surface px-6 py-10">
         <div class="relative flex h-64 w-full items-center justify-center">
           <div id="glow" class="absolute h-48 w-56 rounded-full blur-3xl"></div>
           <svg viewBox="0 0 280 160" class="relative z-10 w-72 max-w-full" aria-hidden="true">
-            <rect x="28" y="36" width="224" height="96" rx="18" fill="#12181e" stroke="#3dbe9a" stroke-width="3" id="boxStroke"/>
-            <rect x="48" y="58" width="150" height="8" rx="4" fill="#24303a"/>
-            <circle id="lamp" cx="214" cy="84" r="7" fill="#3dbe9a"/>
-            <circle cx="190" cy="84" r="4" fill="#3a4854"/>
-            <circle cx="174" cy="84" r="4" fill="#3a4854"/>
-            <text x="48" y="112" fill="#93a099" font-family="Outfit, sans-serif" font-size="13">living room box</text>
+            <rect x="28" y="36" width="224" height="96" rx="18" fill="#0c1014" stroke="#3dbe9a" stroke-width="3" id="box-body" />
+            <rect x="48" y="58" width="150" height="8" rx="4" fill="#2a343c" />
+            <circle id="lamp" cx="214" cy="84" r="7" fill="#3dbe9a" />
+            <circle cx="190" cy="84" r="4" fill="#93a099" />
+            <circle cx="174" cy="84" r="4" fill="#93a099" />
+            <text x="48" y="112" fill="#93a099" font-family="Outfit, sans-serif" font-size="13">home box</text>
           </svg>
         </div>
-        <p id="status" class="text-center text-base font-medium text-cool">Calm. Safe to rest a hand on.</p>
+        <p id="mood" class="text-center text-base font-medium text-cool">A hand can stay. No fan.</p>
         <div class="grid w-full max-w-md grid-cols-2 gap-3">
           <div class="rounded-2xl border border-line bg-bg px-4 py-3">
-            <div class="flex items-baseline justify-between"><span class="text-sm text-muted">Surface</span><span id="temp" class="text-lg font-medium">31°C</span></div>
-            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2"><div id="tempBar" class="h-full rounded-full"></div></div>
+            <div class="flex items-baseline justify-between gap-2">
+              <span class="text-sm text-muted">Whole box</span>
+              <span id="watts" class="text-lg font-medium">4 W</span>
+            </div>
+            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2">
+              <div id="watts-bar" class="h-full rounded-full" style="width:22%;background:#3dbe9a"></div>
+            </div>
           </div>
           <div class="rounded-2xl border border-line bg-bg px-4 py-3">
-            <div class="flex items-baseline justify-between"><span class="text-sm text-muted">Electricity</span><span id="watts" class="text-lg font-medium">9 W</span></div>
-            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2"><div id="wattBar" class="h-full rounded-full"></div></div>
+            <div class="flex items-baseline justify-between gap-2">
+              <span class="text-sm text-muted">Hand limit</span>
+              <span class="text-lg font-medium">18 W</span>
+            </div>
+            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2">
+              <div class="h-full rounded-full" style="width:100%;background:#93a099"></div>
+            </div>
           </div>
         </div>
       </div>
+
       <div class="flex flex-col gap-6">
         <div>
-          <div class="flex items-baseline justify-between gap-3"><label class="text-base font-medium" for="brain">Weights</label><span id="brainName" class="text-right text-sm text-cool">1 billion</span></div>
-          <p class="mt-1 text-sm text-muted">How many weights the brain needs.</p>
-          <input id="brain" class="mt-3 h-11 w-full accent-cool" type="range" min="0" max="3" step="1" value="0" />
-          <p id="brainNote" class="text-sm leading-relaxed text-muted">Not a nickname. A count.</p>
-        </div>
-        <fieldset>
-          <legend class="text-base font-medium">Chip type</legend>
-          <p class="mt-1 text-sm text-muted">Where the thinking happens.</p>
-          <div class="mt-3 grid grid-cols-2 gap-2">
-            <button id="old" type="button" class="min-h-12 rounded-2xl border px-3 text-sm font-medium border-line bg-surface">Traditional compute</button>
-            <button id="cim" type="button" class="min-h-12 rounded-2xl border px-3 text-sm font-medium border-cool bg-cool text-bg">compute-in-memory</button>
+          <div class="flex items-baseline justify-between gap-3">
+            <label class="text-base font-medium" for="weights">Weights</label>
+            <span id="weight-label" class="text-sm text-cool">80 million</span>
           </div>
-          <p id="chipNote" class="mt-3 text-sm leading-relaxed text-muted"></p>
-        </fieldset>
-        <div>
-          <div class="flex items-baseline justify-between gap-3"><label class="text-base font-medium" for="room">Room weather</label><span id="roomName" class="text-right text-sm text-cool">Normal Room (27°C)</span></div>
-          <p class="mt-1 text-sm text-muted">The air the box has to give its heat to.</p>
-          <input id="room" class="mt-3 h-11 w-full accent-cool" type="range" min="0" max="2" step="1" value="1" />
-          <p class="text-sm leading-relaxed text-muted">A hotter room has less room left before the box itself feels hot.</p>
+          <p class="mt-1 text-sm text-muted">How big a brain the house is asking for.</p>
+          <input id="weights" type="range" min="0" max="6" step="1" value="0" />
+          <p id="weight-note" class="text-sm leading-relaxed text-muted">All of these weights sit on the chip. Thinking happens where they already are.</p>
         </div>
-        <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg">Run 1,000 days of use</button>
-        <p id="ran" class="text-sm text-muted" aria-live="polite">Press it to look through another thousand ordinary days.</p>
+        <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg disabled:opacity-70">Run 1,000 days of use</button>
+        <p id="runs" class="text-sm text-muted" aria-live="polite">Press it to look through another thousand ordinary days.</p>
       </div>
     </section>
+
     <section class="rounded-3xl border border-line bg-surface2 px-6 py-7 sm:px-8">
       <p id="verdict" class="font-display text-2xl leading-snug sm:text-3xl"></p>
       <dl class="mt-6 grid gap-4 sm:grid-cols-2">
-        <div><dt class="text-sm text-muted">On the array, under 45 W, no fan</dt><dd id="onArray" class="mt-1 font-display text-4xl">1 billion</dd></div>
-        <div><dt class="text-sm text-muted">The rest</dt><dd id="rest" class="mt-1 font-display text-4xl">0 billion</dd></div>
+        <div class="rounded-2xl border border-line bg-bg px-4 py-4">
+          <dt class="text-sm text-muted">On the chip</dt>
+          <dd id="on-chip" class="mt-1 font-display text-4xl">80 million</dd>
+          <p id="on-note" class="mt-2 text-sm text-muted"></p>
+        </div>
+        <div class="rounded-2xl border border-line bg-bg px-4 py-4">
+          <dt class="text-sm text-muted">Moved to the processor</dt>
+          <dd id="carried" class="mt-1 font-display text-4xl">0 million</dd>
+          <p id="carry-note" class="mt-2 text-sm text-muted"></p>
+        </div>
       </dl>
-      <p class="mt-6 max-w-2xl text-base leading-relaxed text-muted">This box's array holds 1 billion weights. Under 45 W those can sit still. Every weight past that has to be carried in, and the carrying is the heat.</p>
+      <p id="fine" class="mt-6 max-w-2xl text-base leading-relaxed text-muted"></p>
     </section>
   </main>
   <script>
-    const WEIGHTS = [1, 8, 70, 400];
-    const ARRAY = 1, SIT = 8, CARRY = 40, FAN = 45, HOT = 48;
-    const ROOMS = [
-      { name: "Air-Conditioned Room", c: 20 },
-      { name: "Normal Room", c: 27 },
-      { name: "Hot Summer Day", c: 35 }
-    ];
-    let chip = 1, seed = 7, runs = 0, running = false;
-    const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-    function simulate() {
-      const total = WEIGHTS[+brain.value];
-      const old = chip === 0;
-      const onArray = old ? 0 : Math.min(total, ARRAY);
-      const rest = total - onArray;
-      const base = onArray * SIT + rest * CARRY;
-      const k = old || rest > 0 ? 0.62 : 0.48;
-      const amb = ROOMS[+room.value].c;
-      let hotDays = 0, tempSum = 0, worst = 0;
-      for (let d = 0; d < 1000; d++) {
-        const r1 = hash(seed + d * 1.7), r2 = hash(seed + d * 3.1 + 9);
-        const surface = amb + (r2 - 0.5) * 4 + base * (0.72 + r1 * 1.15) * k;
-        tempSum += amb + (r2 - 0.5) * 4 + base * k;
-        if (surface > worst) worst = surface;
-        if (surface >= HOT) hotDays++;
-      }
-      return { typicalTemp: tempSum / 1000, typicalWatts: base, chance: hotDays / 1000, worst, onArray, rest };
+    const STEPS = [80, 160, 320, 640, 1000, 3000, 8000];
+    const SHELF = 80;
+    const CHIP_WATTS = 4;
+    const CARRY_PER_SHELF = 8;
+    const HAND = 18;
+    let seed = 3;
+    let runs = 0;
+    let running = false;
+
+    function hash(n) {
+      const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+      return x - Math.floor(x);
     }
-    function verdict(r) {
-      const on = r.onArray + " billion", left = r.rest === 0 ? "Nothing has to be carried in." : r.rest + " billion have to be carried in.";
-      if (r.rest === 0 && r.typicalWatts <= FAN && r.chance < 0.02 && r.typicalTemp < 40)
-        return "A product, not a sentence: " + on + " weights sit on the array. " + left + " Under 45 W, no fan.";
-      if (r.typicalWatts <= FAN && r.chance < 0.08)
-        return "Close: " + on + " weights sit on the array. " + left + " It stays near 45 W, but some days it wants a fan.";
-      return "A sentence, not a product: " + on + " weights sit on the array. " + left + " That is past 45 W with no fan.";
+    function labelOf(millions) {
+      if (millions >= 1000) {
+        const billions = millions / 1000;
+        return billions === 1 ? "1 billion" : billions + " billion";
+      }
+      return millions + " million";
+    }
+    function split(step) {
+      const total = STEPS[step];
+      const onChip = Math.min(total, SHELF);
+      const carried = total - onChip;
+      const chipWatts = CHIP_WATTS * (onChip / SHELF);
+      const carryWatts = (carried / SHELF) * CARRY_PER_SHELF;
+      return { total, onChip, carried, chipWatts, carryWatts, watts: chipWatts + carryWatts };
+    }
+    function simulate(step) {
+      const base = split(step);
+      let noisy = 0;
+      let worst = 0;
+      for (let d = 0; d < 1000; d++) {
+        const spike = 0.85 + hash(seed + d * 1.7) * 0.5;
+        const watts = base.watts * spike;
+        if (watts > worst) worst = watts;
+        if (watts >= HAND) noisy += 1;
+      }
+      return Object.assign(base, { chance: noisy / 1000, worst });
+    }
+    function verdict(s) {
+      if (s.carried === 0 && s.watts < HAND && s.chance < 0.02) {
+        return "Yes. All 80 million weights stay on the chip, the box uses about 4 watts, and a hand can stay on it. No fan.";
+      }
+      if (s.watts < HAND && s.chance < 0.08) {
+        return "Still quiet. " + labelOf(s.carried) + " left the chip, but the shell can still hand the heat to the air. No fan yet.";
+      }
+      return "No. Only " + labelOf(s.onChip) + " still think on the chip. " + labelOf(s.carried) + " moved to a processor, because they have to be carried in. That is past " + HAND + " watts. Past that, a hand cannot stay, so the box needs a fan.";
     }
     function paint() {
-      const r = simulate();
-      const mood = r.typicalTemp >= HOT ? "hot" : r.typicalTemp >= 40 ? "warm" : "cool";
+      const step = Number(document.getElementById("weights").value);
+      const s = simulate(step);
+      const mood = s.watts >= HAND ? "hot" : s.watts >= 13 ? "warm" : "cool";
       const color = mood === "hot" ? "#e25b4a" : mood === "warm" ? "#e0a04a" : "#3dbe9a";
       const glow = document.getElementById("glow");
       glow.style.background = color;
       glow.style.opacity = mood === "cool" ? "0.35" : "0.7";
-      glow.classList.toggle("glow-hot", mood === "hot");
-      document.getElementById("boxStroke").setAttribute("stroke", color);
+      glow.className = "absolute h-48 w-56 rounded-full blur-3xl" + (mood === "hot" ? " glow-hot" : "");
+      document.getElementById("box-body").setAttribute("stroke", color);
       document.getElementById("lamp").setAttribute("fill", color);
-      const status = document.getElementById("status");
-      status.textContent = mood === "hot" ? "Too hot for a living room!" : mood === "warm" ? "Getting warm. Fine for a while." : "Calm. Safe to rest a hand on.";
-      status.className = "text-center text-base font-medium " + (mood === "hot" ? "text-hot" : mood === "warm" ? "text-warm" : "text-cool");
-      const show = Math.round(r.typicalTemp);
-      document.getElementById("temp").textContent = show + "\u00b0C";
-      document.getElementById("watts").textContent = Math.round(r.typicalWatts) + " W";
-      document.getElementById("tempBar").style.width = Math.min(100, ((show - 18) / 70) * 100) + "%";
-      document.getElementById("wattBar").style.width = Math.min(100, (r.typicalWatts / FAN) * 100) + "%";
-      document.getElementById("tempBar").style.background = color;
-      document.getElementById("wattBar").style.background = color;
-      document.getElementById("brainName").textContent = WEIGHTS[+brain.value] + " billion";
-      document.getElementById("brainNote").textContent = "Not a nickname. A count.";
-      document.getElementById("roomName").textContent = ROOMS[+room.value].name + " (" + ROOMS[+room.value].c + "\u00b0C)";
-      document.getElementById("chipNote").textContent = chip === 0
-        ? "Traditional compute shuffles information back and forth. Most of the electricity is spent moving it, so the box heats up fast."
-        : "Compute-in-memory thinks where the memory already lives. Thoughts happen on the spot, so far less electricity turns into heat.";
-      const on = "min-h-12 rounded-2xl border px-3 text-sm font-medium border-cool bg-cool text-bg";
-      const off = "min-h-12 rounded-2xl border px-3 text-sm font-medium border-line bg-surface text-fg";
-      old.className = chip === 0 ? on : off;
-      cim.className = chip === 1 ? on : off;
-      document.getElementById("verdict").textContent = verdict(r);
-      document.getElementById("onArray").textContent = r.onArray + " billion";
-      document.getElementById("rest").textContent = r.rest + " billion";
-      window.__worst = r.worst;
+      const moodEl = document.getElementById("mood");
+      moodEl.className = "text-center text-base font-medium " + (mood === "hot" ? "text-hot" : mood === "warm" ? "text-warm" : "text-cool");
+      moodEl.textContent = mood === "hot" ? "Too hot to keep a hand on. Needs a fan." : mood === "warm" ? "Warm. A hand can still stay." : "A hand can stay. No fan.";
+      document.getElementById("watts").textContent = Math.round(s.watts) + " W";
+      const bar = document.getElementById("watts-bar");
+      bar.style.width = Math.min(100, (s.watts / HAND) * 100) + "%";
+      bar.style.background = color;
+      document.getElementById("weight-label").textContent = labelOf(s.total);
+      document.getElementById("weight-note").textContent = s.carried === 0
+        ? "All of these weights sit on the chip. Thinking happens where they already are."
+        : "Only 80 million still sit on the chip. The rest moved to a processor, and that processor has to carry them in.";
+      document.getElementById("verdict").textContent = verdict(s);
+      document.getElementById("on-chip").textContent = labelOf(s.onChip);
+      document.getElementById("on-note").textContent = "Thinking happens where these weights sit. About " + Math.round(s.chipWatts) + " W.";
+      document.getElementById("carried").textContent = labelOf(s.carried);
+      document.getElementById("carry-note").textContent = s.carried === 0
+        ? "Nothing left the chip."
+        : s.watts < HAND
+          ? "These have to be carried in. About " + Math.round(s.carryWatts) + " W. The shell can still take it."
+          : "These have to be carried in. About " + Math.round(s.carryWatts) + " W. That is what forces a fan.";
+      document.getElementById("fine").textContent = "Chance of a day that needs a fan: " + Math.round(s.chance * 100) + "%. A hand left on the shell for about 10 minutes reaches the burn line at 48°C, for plastic or for metal. This box is 22 cm by 14 cm by 4.5 cm, sitting on a shelf, in 25°C air. Still air can take about 18 watts before the outside hits that line. Above that, the shell would have to get hotter, so it needs a fan. That 18 watts is a calculation, not a measurement of a finished box. The 80 million and the 4 watts are what a chip on sale today publishes. The climb after that is a picture: every extra 80 million that must be carried is counted as 8 watts.";
+      document.getElementById("runs").textContent = runs === 0
+        ? "Press it to look through another thousand ordinary days."
+        : "Checked " + (runs === 1 ? "1,000 days" : runs + ",000 days") + ". Busiest stretch: " + Math.round(s.worst) + " W.";
     }
-    const brain = document.getElementById("brain");
-    const room = document.getElementById("room");
-    const old = document.getElementById("old");
-    const cim = document.getElementById("cim");
-    brain.addEventListener("input", paint);
-    room.addEventListener("input", paint);
-    old.addEventListener("click", () => { chip = 0; paint(); });
-    cim.addEventListener("click", () => { chip = 1; paint(); });
-    document.getElementById("run").addEventListener("click", () => {
+    document.getElementById("weights").addEventListener("input", paint);
+    document.getElementById("run").addEventListener("click", function () {
       if (running) return;
       running = true;
-      const btn = document.getElementById("run");
-      btn.disabled = true;
-      btn.textContent = "Checking 1,000 days\u2026";
-      setTimeout(() => {
-        seed += 17; runs += 1; running = false;
-        btn.disabled = false;
-        btn.textContent = "Run 1,000 days of use";
+      const button = document.getElementById("run");
+      button.disabled = true;
+      button.textContent = "Checking 1,000 days…";
+      setTimeout(function () {
+        seed += 17;
+        runs += 1;
+        running = false;
+        button.disabled = false;
+        button.textContent = "Run 1,000 days of use";
         paint();
-        document.getElementById("ran").textContent = "Checked " + (runs === 1 ? "1,000" : runs + ",000") + " days. Hottest touch in that stretch: " + Math.round(window.__worst) + "\u00b0C.";
       }, 280);
     });
     paint();
