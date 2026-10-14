@@ -45,90 +45,91 @@
   <main class="mx-auto flex max-w-5xl flex-col gap-8 px-5 py-10 sm:px-8 sm:py-14">
     <header class="max-w-2xl">
       <p class="text-sm tracking-wide text-muted">One box for the house</p>
-      <h1 class="mt-2 font-display text-4xl leading-tight sm:text-5xl">Can the house answer its own devices, quietly?</h1>
-      <p class="mt-4 text-lg leading-relaxed text-muted">Same box, two ways to think. One hauls every weight across a wire on every answer. The other leaves every weight where it sits.</p>
+      <h1 class="mt-2 font-display text-4xl leading-tight sm:text-5xl">Same weights. Two ways to think.</h1>
+      <p class="mt-4 text-lg leading-relaxed text-muted">Both answers stay on the page. One hauls every weight across a wire. The other leaves every weight where it sits. Move the size. Watch both.</p>
     </header>
 
-    <section class="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-      <div class="flex flex-col items-center gap-6 rounded-3xl border border-line bg-surface px-6 py-10">
-        <div class="relative flex h-64 w-full items-center justify-center">
-          <div id="glow" class="pointer-events-none absolute h-48 w-56 rounded-full blur-3xl"></div>
-          <svg viewBox="0 0 280 160" class="relative z-10 w-72 max-w-full" aria-hidden="true">
-            <rect x="28" y="36" width="224" height="96" rx="18" fill="#0c1014" stroke="#3dbe9a" stroke-width="3" id="box-body" />
+    <section class="rounded-3xl border border-line bg-surface px-5 py-6 sm:px-7">
+      <div class="flex items-baseline justify-between gap-3">
+        <label class="text-base font-medium" for="weights">Weights</label>
+        <span id="weight-label" class="text-sm text-cool">80 million</span>
+      </div>
+      <p class="mt-1 text-sm text-muted">How big a brain the house is asking for.</p>
+      <input id="weights" type="range" min="0" max="7" step="1" value="0" class="mt-3 h-11 w-full" />
+      <div id="stops" class="mt-2 flex flex-wrap gap-2"></div>
+      <p id="pair" class="mt-4 text-base">Hauled: 4 W. In place: 3 W. Hand limit: 18 W.</p>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-2">
+      <article class="flex flex-col gap-4 rounded-3xl border border-line bg-surface2 px-5 py-6">
+        <div>
+          <h2 class="font-display text-2xl">Compute-in-memory</h2>
+          <p class="mt-1 text-sm text-muted">Every weight stays in its seat.</p>
+        </div>
+        <div class="relative flex h-40 items-center justify-center overflow-hidden">
+          <div id="stay-glow" class="pointer-events-none absolute h-32 w-40 rounded-full blur-3xl"></div>
+          <svg viewBox="0 0 280 160" class="relative z-10 w-56 max-w-full" aria-hidden="true">
+            <rect id="stay-body" x="28" y="36" width="224" height="96" rx="18" fill="#0c1014" stroke="#3dbe9a" stroke-width="3" />
             <rect x="48" y="58" width="150" height="8" rx="4" fill="#2a343c" />
-            <circle id="lamp" cx="214" cy="84" r="7" fill="#3dbe9a" />
-            <circle cx="190" cy="84" r="4" fill="#93a099" />
-            <circle cx="174" cy="84" r="4" fill="#93a099" />
-            <text x="48" y="112" fill="#93a099" font-family="Outfit, sans-serif" font-size="13">home box</text>
+            <circle id="stay-lamp" cx="214" cy="84" r="7" fill="#3dbe9a" />
           </svg>
         </div>
-        <p id="mood" class="text-center text-base font-medium text-cool">A hand can stay. No fan.</p>
-        <div class="grid w-full max-w-md grid-cols-2 gap-3">
+        <p id="stay-mood" class="text-base font-medium text-cool">A hand can stay. No fan.</p>
+        <p id="stay-watts" class="font-display text-5xl">3 W</p>
+        <p id="stay-verdict" class="text-base leading-relaxed"></p>
+        <dl class="grid gap-3 sm:grid-cols-2">
           <div class="rounded-2xl border border-line bg-bg px-4 py-3">
-            <div class="flex items-baseline justify-between gap-2">
-              <span class="text-sm text-muted">Whole box</span>
-              <span id="watts" class="text-lg font-medium">4 W</span>
-            </div>
-            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2">
-              <div id="watts-bar" class="h-full rounded-full" style="width:22%;background:#3dbe9a"></div>
-            </div>
+            <dt class="text-sm text-muted">On the chip</dt>
+            <dd id="stay-on" class="mt-1 font-display text-3xl">80 million</dd>
           </div>
           <div class="rounded-2xl border border-line bg-bg px-4 py-3">
-            <div class="flex items-baseline justify-between gap-2">
-              <span class="text-sm text-muted">Hand limit</span>
-              <span class="text-lg font-medium">18 W</span>
-            </div>
-            <div class="mt-3 h-2 overflow-hidden rounded-full bg-surface2">
-              <div class="h-full rounded-full" style="width:100%;background:#93a099"></div>
-            </div>
+            <dt class="text-sm text-muted">Moved to the processor</dt>
+            <dd id="stay-moved" class="mt-1 font-display text-3xl">0 million</dd>
+            <p class="mt-1 text-sm text-muted">Nothing leaves its seat.</p>
           </div>
-        </div>
-      </div>
+        </dl>
+      </article>
 
-      <div class="flex flex-col gap-6">
-        <div role="radiogroup" aria-label="How the weights sit" class="grid gap-2">
-          <button id="way-haul" type="button" role="radio" aria-checked="true" class="min-h-11 rounded-2xl border border-cool bg-cool px-4 py-3 text-left text-sm font-medium text-bg">Von Neumann / GPU (Weights hauled on every token)</button>
-          <button id="way-stay" type="button" role="radio" aria-checked="false" class="min-h-11 rounded-2xl border border-line bg-bg px-4 py-3 text-left text-sm font-medium text-fg">Compute-in-Memory (Weights stay in place)</button>
-        </div>
+      <article class="flex flex-col gap-4 rounded-3xl border border-line bg-surface2 px-5 py-6">
         <div>
-          <div class="flex items-baseline justify-between gap-3">
-            <label class="text-base font-medium" for="weights">Weights</label>
-            <span id="weight-label" class="text-sm text-cool">80 million</span>
-          </div>
-          <p class="mt-1 text-sm text-muted">How big a brain the house is asking for.</p>
-          <input id="weights" type="range" min="0" max="7" step="1" value="0" class="relative z-10 mt-3 h-11 w-full" />
-          <div id="stops" class="mt-2 flex flex-wrap gap-2"></div>
-          <p id="weight-note" class="text-sm leading-relaxed text-muted">Every weight lives off the chip, and is hauled across a wire 100 times a second.</p>
+          <h2 class="font-display text-2xl">Von Neumann / GPU</h2>
+          <p class="mt-1 text-sm text-muted">Every weight is hauled on every answer.</p>
         </div>
-        <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg disabled:opacity-70">Run 1,000 days of use</button>
-        <p id="runs" class="text-sm text-muted" aria-live="polite">Press it to look through another thousand ordinary days.</p>
-      </div>
+        <div class="relative flex h-40 items-center justify-center overflow-hidden">
+          <div id="haul-glow" class="pointer-events-none absolute h-32 w-40 rounded-full blur-3xl"></div>
+          <svg viewBox="0 0 280 160" class="relative z-10 w-56 max-w-full" aria-hidden="true">
+            <rect id="haul-body" x="28" y="36" width="224" height="96" rx="18" fill="#0c1014" stroke="#3dbe9a" stroke-width="3" />
+            <rect x="48" y="58" width="150" height="8" rx="4" fill="#2a343c" />
+            <circle id="haul-lamp" cx="214" cy="84" r="7" fill="#3dbe9a" />
+          </svg>
+        </div>
+        <p id="haul-mood" class="text-base font-medium text-cool">A hand can stay. No fan.</p>
+        <p id="haul-watts" class="font-display text-5xl">4 W</p>
+        <p id="haul-verdict" class="text-base leading-relaxed"></p>
+        <dl class="grid gap-3 sm:grid-cols-2">
+          <div class="rounded-2xl border border-line bg-bg px-4 py-3">
+            <dt class="text-sm text-muted">On the chip</dt>
+            <dd id="haul-on" class="mt-1 font-display text-3xl">0 million</dd>
+          </div>
+          <div class="rounded-2xl border border-line bg-bg px-4 py-3">
+            <dt class="text-sm text-muted">Moved to the processor</dt>
+            <dd id="haul-moved" class="mt-1 font-display text-3xl">80 million</dd>
+            <p id="haul-move-note" class="mt-1 text-sm text-muted"></p>
+          </div>
+        </dl>
+      </article>
     </section>
 
-    <section class="rounded-3xl border border-line bg-surface2 px-6 py-7 sm:px-8">
-      <p id="verdict" class="font-display text-2xl leading-snug sm:text-3xl"></p>
-      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
-        <div class="rounded-2xl border border-line bg-bg px-4 py-4">
-          <dt class="text-sm text-muted">On the chip</dt>
-          <dd id="on-chip" class="mt-1 font-display text-4xl">80 million</dd>
-          <p id="on-note" class="mt-2 text-sm text-muted"></p>
-        </div>
-        <div class="rounded-2xl border border-line bg-bg px-4 py-4">
-          <dt class="text-sm text-muted">Moved to the processor</dt>
-          <dd id="carried" class="mt-1 font-display text-4xl">80 million</dd>
-          <p id="carry-note" class="mt-2 text-sm text-muted"></p>
-        </div>
-      </dl>
-      <p id="fine" class="mt-6 max-w-2xl text-base leading-relaxed text-muted"></p>
-    </section>
+    <div class="flex flex-col gap-3">
+      <button id="run" type="button" class="h-12 rounded-2xl bg-fg px-4 text-base font-medium text-bg disabled:opacity-70">Run 1,000 days of use</button>
+      <p id="runs" class="text-sm text-muted" aria-live="polite">Press it to look through another thousand ordinary days.</p>
+      <p id="fine" class="max-w-2xl text-base leading-relaxed text-muted"></p>
+    </div>
   </main>
   <script>
     const STEPS = [80, 160, 320, 640, 1000, 1500, 3000, 8000];
-    const BASE_WATTS = 3;
-    const HAUL_PER_100M = 1.5;
-    const STAY_PER_100M = 0.15;
+    const BASE = 3;
     const HAND = 18;
-    let way = "haul";
     let seed = 3;
     let runs = 0;
     let running = false;
@@ -147,100 +148,75 @@
     function wattsText(n) {
       return Number.isInteger(n) ? String(n) : n.toFixed(1);
     }
-    function split(step) {
-      const total = STEPS[step];
-      const rate = way === "stay" ? STAY_PER_100M : HAUL_PER_100M;
-      const moveWatts = (total / 100) * rate;
+    function split(total, stay) {
+      const moveWatts = (total / 100) * (stay ? 0.15 : 1.5);
       return {
         total: total,
-        onChip: way === "stay" ? total : 0,
-        carried: way === "stay" ? 0 : total,
+        onChip: stay ? total : 0,
+        carried: stay ? 0 : total,
         moveWatts: moveWatts,
-        watts: Math.round(BASE_WATTS + moveWatts)
+        watts: Math.round(BASE + moveWatts)
       };
     }
-    function simulate(step) {
-      const base = split(step);
+    function simulate(total, stay) {
+      const base = split(total, stay);
       let noisy = 0;
       let worst = 0;
       for (let d = 0; d < 1000; d++) {
-        const spike = way === "stay" ? 0.97 + hash(seed + d * 1.7) * 0.06 : 0.85 + hash(seed + d * 1.7) * 0.5;
+        const spike = stay ? 0.97 + hash(seed + d * 1.7) * 0.06 : 0.85 + hash(seed + d * 1.7) * 0.5;
         const watts = base.watts * spike;
         if (watts > worst) worst = watts;
         if (watts >= HAND) noisy += 1;
       }
       return Object.assign(base, { chance: noisy / 1000, worst: worst });
     }
-    function verdict(s) {
-      if (way === "stay") {
-        return "All " + labelOf(s.total) + " weights stay in their seats. Zero wires crossed. Entire box draws " + s.watts + " watts. A hand can stay. No fan.";
+    function moodOf(watts, stay) {
+      if (stay && watts < HAND) return "cool";
+      if (watts >= HAND) return "hot";
+      if (watts >= 13) return "warm";
+      return "cool";
+    }
+    function paintSide(prefix, s, stay) {
+      const mood = moodOf(s.watts, stay);
+      const color = mood === "hot" ? "#e25b4a" : mood === "warm" ? "#e0a04a" : "#3dbe9a";
+      const glow = document.getElementById(prefix + "-glow");
+      glow.style.background = color;
+      glow.style.opacity = mood === "cool" ? "0.35" : "0.7";
+      glow.className = "pointer-events-none absolute h-32 w-40 rounded-full blur-3xl" + (mood === "hot" ? " glow-hot" : "");
+      document.getElementById(prefix + "-body").setAttribute("stroke", color);
+      document.getElementById(prefix + "-lamp").setAttribute("fill", color);
+      const moodEl = document.getElementById(prefix + "-mood");
+      moodEl.className = "text-base font-medium " + (mood === "hot" ? "text-hot" : mood === "warm" ? "text-warm" : "text-cool");
+      moodEl.textContent = mood === "hot"
+        ? (s.watts === HAND ? "Right on the hand limit. Needs a fan." : "Too hot to keep a hand on. Needs a fan.")
+        : "A hand can stay. No fan.";
+      document.getElementById(prefix + "-watts").textContent = s.watts + " W";
+      document.getElementById(prefix + "-on").textContent = labelOf(s.onChip);
+      document.getElementById(prefix + "-moved").textContent = labelOf(s.carried);
+      if (stay) {
+        document.getElementById(prefix + "-verdict").textContent = "All " + labelOf(s.total) + " weights stay in their seats. Zero wires crossed. Entire box draws " + s.watts + " watts. A hand can stay. No fan.";
+      } else {
+        document.getElementById(prefix + "-verdict").textContent = "Hauling " + labelOf(s.total) + " weights across wires 100 times a second burns " + s.watts + " watts. " + (s.watts >= HAND ? "Needs a fan." : "Stays quiet.");
+        document.getElementById(prefix + "-move-note").textContent = "Hauled 100 times a second. About " + wattsText(s.moveWatts) + " W.";
       }
-      return "Hauling " + labelOf(s.total) + " weights across wires 100 times a second burns " + s.watts + " watts. " + (s.watts >= HAND ? "Needs a fan." : "Stays quiet.");
     }
     function paint() {
       const step = Number(document.getElementById("weights").value);
-      const s = simulate(step);
-      const mood = way === "stay" && s.watts < HAND ? "cool" : s.watts >= HAND ? "hot" : s.watts >= 13 ? "warm" : "cool";
-      const color = mood === "hot" ? "#e25b4a" : mood === "warm" ? "#e0a04a" : "#3dbe9a";
-      const glow = document.getElementById("glow");
-      glow.style.background = color;
-      glow.style.opacity = mood === "cool" ? "0.35" : "0.7";
-      glow.className = "pointer-events-none absolute h-48 w-56 rounded-full blur-3xl" + (mood === "hot" ? " glow-hot" : "");
-      document.getElementById("box-body").setAttribute("stroke", color);
-      document.getElementById("lamp").setAttribute("fill", color);
-      const moodEl = document.getElementById("mood");
-      moodEl.className = "text-center text-base font-medium " + (mood === "hot" ? "text-hot" : mood === "warm" ? "text-warm" : "text-cool");
-      moodEl.textContent = mood === "hot"
-        ? (s.watts === HAND ? "Right on the hand limit. Needs a fan." : "Too hot to keep a hand on. Needs a fan.")
-        : mood === "warm" ? "Warm. A hand can still stay." : "A hand can stay. No fan.";
-      document.getElementById("watts").textContent = Math.round(s.watts) + " W";
-      const bar = document.getElementById("watts-bar");
-      bar.style.width = Math.min(100, (s.watts / HAND) * 100) + "%";
-      bar.style.background = color;
-      document.getElementById("weight-label").textContent = labelOf(s.total);
+      const total = STEPS[step];
+      const haul = simulate(total, false);
+      const stay = simulate(total, true);
+      document.getElementById("weight-label").textContent = labelOf(total);
+      document.getElementById("pair").textContent = "Hauled: " + haul.watts + " W. In place: " + stay.watts + " W. Hand limit: 18 W.";
       document.querySelectorAll("#stops button").forEach(function (button) {
         const on = Number(button.dataset.step) === step;
         button.className = "min-h-11 rounded-full border px-3 text-sm " + (on ? "border-cool bg-cool text-bg" : "border-line bg-bg text-muted");
       });
-      document.getElementById("weight-note").textContent = way === "stay"
-        ? "Every weight stays where it lives. Nothing crosses a wire."
-        : "Every weight lives off the chip, and is hauled across a wire 100 times a second.";
-      document.getElementById("verdict").textContent = verdict(s);
-      document.getElementById("on-chip").textContent = labelOf(s.onChip);
-      document.getElementById("on-note").textContent = way === "stay"
-        ? "Thinking happens right where the weights live."
-        : "None of the weights sit where the thinking happens.";
-      document.getElementById("carried").textContent = labelOf(s.carried);
-      document.getElementById("carry-note").textContent = way === "stay"
-        ? "Nothing leaves its seat."
-        : s.watts < HAND
-          ? "Hauled 100 times a second. About " + wattsText(s.moveWatts) + " W, plus 3 W for the box."
-          : s.watts === HAND
-            ? "Hauled 100 times a second. About " + wattsText(s.moveWatts) + " W. With the box, that is the 18 watt line."
-            : "Hauled 100 times a second. About " + wattsText(s.moveWatts) + " W. That is what forces a fan.";
-      document.getElementById("fine").textContent = way === "stay"
-        ? "Every weight stays in its seat. The box itself is 3 watts. Thinking in place costs 0.15 watts per 100 million weights. Eight billion weights is 15 watts, still under the line. Hauling those same 8 billion burns 123 watts and needs a fan. The hand limit is 18 watts for a 22 cm by 14 cm by 4.5 cm box in 25°C air, before the outside hits 48°C."
-        : "Chance of a day that needs a fan: " + Math.round(s.chance * 100) + "%. Every weight lives off the chip. The box itself is 3 watts. Hauling costs 1.5 watts per 100 million weights, 100 times a second. One billion weights is 18 watts, the point where a hand cannot stay. The hand limit is for a 22 cm by 14 cm by 4.5 cm box in 25°C air, before the outside hits 48°C. That 18 watts is a calculation, not a measurement of a finished box.";
+      paintSide("haul", haul, false);
+      paintSide("stay", stay, true);
+      document.getElementById("fine").textContent = "The box itself is 3 watts. Hauling costs 1.5 watts per 100 million weights, 100 times a second. Thinking in place costs 0.15 watts per 100 million. A hand left on a 22 cm by 14 cm by 4.5 cm box, in 25°C air, hits 48°C at about 18 watts. That line is a calculation, not a measurement of a finished box. Chance a hauled day needs a fan: " + Math.round(haul.chance * 100) + "%. In place: " + Math.round(stay.chance * 100) + "%.";
       document.getElementById("runs").textContent = runs === 0
         ? "Press it to look through another thousand ordinary days."
-        : "Checked " + (runs === 1 ? "1,000 days" : runs + ",000 days") + ". Busiest stretch: " + Math.round(s.worst) + " W.";
-    }
-    function setWay(next) {
-      way = next;
-      const haul = document.getElementById("way-haul");
-      const stay = document.getElementById("way-stay");
-      const on = "min-h-11 rounded-2xl border border-cool bg-cool px-4 py-3 text-left text-sm font-medium text-bg";
-      const off = "min-h-11 rounded-2xl border border-line bg-bg px-4 py-3 text-left text-sm font-medium text-fg";
-      haul.className = way === "haul" ? on : off;
-      stay.className = way === "stay" ? on : off;
-      haul.setAttribute("aria-checked", way === "haul" ? "true" : "false");
-      stay.setAttribute("aria-checked", way === "stay" ? "true" : "false");
-      paint();
-    }
-    function setStep(i) {
-      const slider = document.getElementById("weights");
-      slider.value = String(i);
-      paint();
+        : "Checked " + (runs === 1 ? "1,000 days" : runs + ",000 days") + ". Busiest haul: " + Math.round(haul.worst) + " W. Busiest in-place day: " + Math.round(stay.worst) + " W.";
     }
     const stops = document.getElementById("stops");
     STEPS.forEach(function (millions, i) {
@@ -248,18 +224,12 @@
       button.type = "button";
       button.dataset.step = String(i);
       button.textContent = labelOf(millions);
-      button.className = "min-h-11 rounded-full border px-3 text-sm";
-      button.addEventListener("pointerdown", function (e) {
-        e.preventDefault();
-        setStep(i);
+      button.addEventListener("click", function () {
+        document.getElementById("weights").value = String(i);
+        paint();
       });
-      button.addEventListener("click", function () { setStep(i); });
       stops.appendChild(button);
     });
-    document.getElementById("way-haul").addEventListener("pointerdown", function (e) { e.preventDefault(); setWay("haul"); });
-    document.getElementById("way-haul").addEventListener("click", function () { setWay("haul"); });
-    document.getElementById("way-stay").addEventListener("pointerdown", function (e) { e.preventDefault(); setWay("stay"); });
-    document.getElementById("way-stay").addEventListener("click", function () { setWay("stay"); });
     document.getElementById("weights").addEventListener("input", paint);
     document.getElementById("run").addEventListener("click", function () {
       if (running) return;
